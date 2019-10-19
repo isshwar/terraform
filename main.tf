@@ -10,12 +10,12 @@ provider "aws" {
 
 resource "aws_instance" "frontend" {
 	provider 	= "aws.virginia"
-	count 		= 1	
-	ami 		= "ami-00eb20669e0990cb4"
-	instance_type 	= "t2.micro"
-	key_name 	= "cfn-key-1"
+	count 		= "${var.count}"	
+	ami 		= "${var.ami}"
+	instance_type 	= "${var.instance["type"]}"
+	key_name 	= "${var.key_name}"
         disable_api_termination = false
-	security_groups = [ "frontend_sec" ]
+	vpc_security_group_ids = [ "${aws_security_group.frontend_security.id}" ]
 	depends_on 	= [ "aws_security_group.frontend_security"]
 	user_data       = "${file("init.sh")}"
 #			   #! /bin/bash -x
@@ -25,7 +25,7 @@ resource "aws_instance" "frontend" {
 #                          echo "<h1>Deployed via Terraform</h1>" | sudo tee /var/www/html/index.html
 #       		   EOF
 	tags {
-		Name 	   = "tf-frontend-1"
+		Name 	   = "${var.instance["name"]}"
 		App 	   = "devops-demo"
         	Maintainer = "Eswar"
 	}
